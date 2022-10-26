@@ -96,7 +96,7 @@ class _HomeState extends State<Home> {
       ),
       body: FutureBuilder<Map>(
         future: getData(),
-        builder: (context, snapshot) {
+        builder: (context, AsyncSnapshot snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
             case ConnectionState.waiting:
@@ -109,8 +109,8 @@ class _HomeState extends State<Home> {
               );
             default:
               if (snapshot.hasError) {
-                return const Center(
-                    child: Text("Erro ao carregar dados :(",
+                return  Center(
+                    child: Text("Erro ao carregar dados :( ${snapshot.error}",
                         style: TextStyle(color: Colors.amber, fontSize: 25.0),
                         textAlign: TextAlign.center));
               } else {
