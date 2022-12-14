@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-
+import 'package:image_picker/image_picker.dart';
 import '../helpers/contact_helper.dart';
 
 class ContactPage extends StatefulWidget {
@@ -58,9 +58,23 @@ class _ContactPageState extends State<ContactPage> {
                         image: _editedContact.img != null
                             ? FileImage(File(_editedContact.img!))
                                 as ImageProvider
-                            : const AssetImage("images/person.png")),
+                            : const AssetImage("images/person.png"),
+                        fit: BoxFit.cover),
                   ),
                 ),
+                onTap: () {
+                  ImagePicker()
+                      .getImage(source: ImageSource.camera)
+                      .then((file) {
+                    if (file == null) {
+                      return;
+                    } else {
+                      setState(() {
+                        _editedContact!.img = file.path;
+                      });
+                    }
+                  });
+                },
               ),
               TextField(
                 controller: _nameController,
@@ -127,15 +141,17 @@ class _ContactPageState extends State<ContactPage> {
                     Navigator.pop(context);
                   },
                 ),
-                TextButton(child: Text("Sim"), onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.pop(context);
-                })
+                TextButton(
+                    child: Text("Sim"),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.pop(context);
+                    })
               ],
             );
           });
       return Future.value(false);
-    }else{
+    } else {
       return Future.value(true);
     }
   }
