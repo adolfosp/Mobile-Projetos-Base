@@ -21,12 +21,15 @@ class _ChatScreenState extends State<ChatScreen> {
   final GoogleSignIn googleSignIn = GoogleSignIn();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   User? _currentUser;
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
     FirebaseAuth.instance.authStateChanges().listen((user) {
-      _currentUser = user;
+      setState(() {
+        _currentUser = user;
+      });
     });
   }
 
@@ -70,19 +73,28 @@ class _ChatScreenState extends State<ChatScreen> {
     Map<String, dynamic> data = {
       "uid": user?.uid,
       "senderName": user?.displayName,
-      "senderPhoto": user?.photoURL
+      "senderPhoto": user?.photoURL,
+      "time": Timestamp.now(),
     };
 
     if (img != null) {
       firebase_storage.UploadTask task = firebase_storage
           .FirebaseStorage.instance
           .ref()
-          .child(DateTime.now().microsecondsSinceEpoch.toString())
+          .child(user!.uid + DateTime.now().microsecondsSinceEpoch.toString())
           .putFile(img);
+
+      setState(() {
+        _isLoading = true;
+      });
 
       firebase_storage.TaskSnapshot taskSnapshot = await task;
       String url = await taskSnapshot.ref.getDownloadURL();
       data["imgUrl"] = url;
+
+      setState(() {
+        _isLoading = false;
+      });
     }
 
     if (text != null) data["text"] = text;
@@ -96,16 +108,37 @@ class _ChatScreenState extends State<ChatScreen> {
       key: _scaffoldKey,
       appBar: AppBar(
         title: Text(
-          "Ola",
+          _currentUser != null
+              ? 'Olá, ${_currentUser?.displayName}'
+              : 'Chat App',
         ),
+        centerTitle: true,
         elevation: 0,
+        actions: [
+          _currentUser != null
+              ? IconButton(
+                  onPressed: () {
+                    FirebaseAuth.instance.signOut();
+                    googleSignIn.signOut();
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Você foi deslogado com sucesso"),
+                      ),
+                    );
+                  },
+                  icon: Icon(Icons.exit_to_app))
+              : Container()
+        ],
       ),
       body: Column(
         children: [
           Expanded(
             child: StreamBuilder(
-              stream:
-                  FirebaseFirestore.instance.collection("messages").snapshots(),
+              stream: FirebaseFirestore.instance
+                  .collection("messages")
+                  .orderBy("time")
+                  .snapshots(),
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
                 switch (snapshot.connectionState) {
@@ -120,7 +153,11 @@ class _ChatScreenState extends State<ChatScreen> {
 
                     return ListView.builder(
                       itemBuilder: (context, index) {
-                        return ChatMessage(documents[index].data as Map<String, dynamic>, true);
+                        return ChatMessage(
+                            documents[index].data as Map<String, dynamic>,
+                            (documents[index].data
+                                    as Map<String, dynamic>)['uid'] ==
+                                _currentUser?.uid);
                       },
                       itemCount: documents.length,
                     );
@@ -128,6 +165,7 @@ class _ChatScreenState extends State<ChatScreen> {
               },
             ),
           ),
+          _isLoading ? LinearProgressIndicator() : Container(),
           TextComposer(_sendMessage)
         ],
       ),
