@@ -11,6 +11,16 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   BitmapDescriptor markerIcon = BitmapDescriptor.defaultMarker;
 
+  LatLng initialLocation = const LatLng(37.422131,-122.084801);
+
+  List<LatLng> polygonPoints = const [
+    LatLng(23.766315,90.425778),
+    LatLng(23.76491,90.424767),
+    LatLng(23.761916,90.426862),
+    LatLng(23.758532,90.428588),
+    LatLng(23.758825,90.429228),
+    LatLng(23.763698,90.431324),
+  ];
 
   @override
   void initState() {
@@ -30,7 +40,7 @@ class _MapScreenState extends State<MapScreen> {
     return Scaffold(
       body: GoogleMap(
         initialCameraPosition: CameraPosition(
-          target: LatLng(37.422131,-122.084801),
+          target: initialLocation,
           zoom: 14
         ),
         markers: {
@@ -43,7 +53,24 @@ class _MapScreenState extends State<MapScreen> {
             },
             icon: markerIcon
           )
-        }
+        },
+        // circles: {
+        //   Circle(
+        //     circleId: CircleId("1"),
+        //     center: initialLocation,
+        //     radius: 430,
+        //     strokeWidth: 2,
+        //     fillColor: Color(0xFF006491).withOpacity(0.2)
+        //   )
+        // },
+        polygons: {
+          Polygon(
+            polygonId: PolygonId("1"),
+            points: polygonPoints,
+            fillColor: Color(0XFF006491).withOpacity(0.2),
+            strokeWidth: 2
+          )
+        },
       ),
     );
   }
