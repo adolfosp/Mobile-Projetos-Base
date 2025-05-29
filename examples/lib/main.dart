@@ -2,6 +2,7 @@ import 'package:examples/animated_search_box.dart';
 import 'package:examples/circular_display.dart';
 import 'package:examples/completer.dart';
 import 'package:examples/curved_bottom_nav_bar.dart';
+import 'package:examples/stream_with_input/form_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const CurvedBottomNavBar(),
+      home: FormScreen(),
     );
   }
 }

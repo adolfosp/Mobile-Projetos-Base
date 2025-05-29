@@ -1,0 +1,2 @@
+D:/Repositories/Mobile-Projetos-Base/examples/android/app/.cxx/Debug/o3r2l2p2/x86/CMakeFiles/edit_cache.dir
+D:/Repositories/Mobile-Projetos-Base/examples/android/app/.cxx/Debug/o3r2l2p2/x86/CMakeFiles/rebuild_cache.dir
